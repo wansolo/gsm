@@ -1,0 +1,100 @@
+
+	
+
+
+	public function showUsers()
+	{
+		//dd(User::All());
+		$users = User::All();
+		$cycles = Cycle::All();
+		$cycledetails = Cycledetail::All();
+
+		return View::make('dashboard/users')->with('users' , $users)->with('cycles' , $cycles)->with('cycledetails' , $cycledetails);
+
+		//return View::make('hello');
+	}
+
+	
+
+	
+
+
+
+		public function addtonewcycle(){
+		$myId = Auth::user()->uid;
+		
+
+		$rules = array(
+		
+			'username' => 'required'
+			
+		);
+
+
+
+		$validator = Validator::make(Input::all(), $rules);
+
+		if($validator->fails()){
+			return Redirect::to('dashboard/addnewcycle/'.$myId)->withErrors($validator)->withInput();
+		}
+		else{
+
+			$referredUser = User::whereUsername(Input::get('username'))->first();
+
+			if (empty($referredUser)) {
+				Session::flash('flash_notice', 'User Does Not Exist !');
+				return Redirect::to('dashboard/addnewcycle/'.$myId);
+			}else{
+			$currentcycleid = Cycle::where('uid', $myId)->max('cid');
+			
+			$currentcycle = Cycle::where('cid', $currentcycleid)->first();
+
+			$currentcycle->date_completed = Carbon\Carbon::now();
+			
+			$currentcycle->save();
+
+			$newcycle = new Cycle;
+            $newcycle->uid = $myId;
+            $newcycle->save();
+
+            $lastcycle = Cycle::where('uid',$myId)->max('cid');
+            
+
+
+
+
+            	$username = Input::get('username');
+				$usernamefromdb = User::whereUsername($username)->first();
+				$userid = $usernamefromdb->uid;
+	
+				
+
+				$cycledetails = new Cycledetail;
+				$cycledetails->uid = $userid;
+				$cycledetails->cid = $lastcycle;
+				$cycledetails->brought_by = $usernamefromdb->brought_by;
+				$cycledetails->under = $myId;	
+				
+				
+				$cycledetails->save();
+
+				//redirect
+				Session::flash('message', 'Successfully Added '.$username. ' to Cycle!');
+				return Redirect::to('dashboard/users');
+
+
+
+  //          	Session::flash('flash_notice', 'Cannot Add Anymore Users To Your Cycle!');
+//				return Redirect::to('dashboard/addtocycle/'.$myId);
+    //        }
+
+			
+			}
+
+
+		}
+
+		}
+
+
+}

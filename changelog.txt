@@ -1,0 +1,7 @@
+changed the realtion ship between cycle and cycledetails to each cycle has many cycle detail
+## check the cycle model for the modification
+
+## did some major change in the dashboardController.php file on the viewcycle function
+	*all changes are commented out in the file
+## changed the viewcyclemember content a bit
+	*just have a look at it and it should all make sense 
